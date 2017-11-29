@@ -13,7 +13,7 @@ parser.add_argument("--reject", help="file to save rejected records")
 args = parser.parse_args()
 
 inputlines = 0;
-outputlines = 0;
+rejects = 0;
 
 # Line must start with an email address and have only one separator (:)
 LINEREG = re.compile(r"^[^@:]+@[^@:]+\.[^@:]+:[^:]*$")
@@ -27,6 +27,7 @@ with open(args.inputfile, "r") as fin, open(args.outputfile, "w") as fout:
 
 		# discard weird line sizes
 		if len(line) > max_line or len(line) < min_line:
+			rejects += 1
 			if args.reject:
 				frej.write(line)
 			continue
@@ -34,14 +35,14 @@ with open(args.inputfile, "r") as fin, open(args.outputfile, "w") as fout:
 		line.strip()
 
 		if not LINEREG.match(line):
+			rejects += 1
 			if args.reject:
 				frej.write(line)
 			continue
 		
 		fout.write(line)
-		outputlines += 1
 
 frej.close()
 
-#print ("parsed " + inputlines + "lines.")
-#print ("written " + outputlines + "lines.")
+print("Parsed {} input records.".format(inputlines))
+print("Rejected {} illegal records.".format(rejects))
